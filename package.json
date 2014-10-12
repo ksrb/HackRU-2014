@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Hack RU 2014 App",
   "dependencies": {
+    "bower": "^1.3.12",
     "express": "~4.9.x",
     "socket.io": "^1.0.2"
   }
