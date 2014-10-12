@@ -56,8 +56,8 @@ app.use(express.static(__dirname + '/bower_components'));
             });
         };
         var onDisconnect = function(){
-            // retrieve the user object using the unique id for this socket connection
-            var userId = user.id;
+            // the current userIdCounter is the userId used for initialization
+            var userId = userIdCounter;
 
             // if the user object exists, delete the user from users data and decrease current user counter
             if (users[userId]){
