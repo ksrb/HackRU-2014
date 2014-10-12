@@ -25,6 +25,11 @@ app.use(express.static(__dirname + '/bower_components'));
 
 // to move to external script later
 (function(socketIO){
+    var config = {
+        SCORE_SUCCESS : 1000,
+        VOTE_TIME_LIMIT: 10000 // ms
+    }
+
     var users = {};
     var userIdCounter = 0;
     var onlineUserCount = 0;
@@ -65,10 +70,15 @@ app.use(express.static(__dirname + '/bower_components'));
 
             var user = users[userId];
             if (isSuccess){
-                user.score += 1000; // temp. hard-code score for successful result
+                user.score += config.SCORE_SUCCESS; // temp. hard-code score for successful result
             }
             // after score updates, broadcast scores to all clients
             broadcastScore();
+        };
+
+        var processVote = function(vote){
+            var songId = vote.songId;
+
         };
 
         var onDisconnect = function(){
@@ -113,6 +123,22 @@ app.use(express.static(__dirname + '/bower_components'));
             }
         }
         io.sockets.emit('score update', userScores);
+    };
+
+    var getOpenSongs = function(){
+
+    };
+
+    var tallyVotes = function(){
+
+    };
+
+    var pollVotes = function(){
+        var availableSongs = getOpenSongs(); // provide some songs for users to select
+        io.sockets.emit('poll votes', availableSongs);
+
+        // after a time period, tally votes
+        setTimeout(tallyVotes, config.VOTE_TIME_LIMIT);
     };
 
     io.on('connection', onConnection);
