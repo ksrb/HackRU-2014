@@ -23,11 +23,19 @@ var userIdCounter = 0;
 var userCount = 0;
 
 io.on('connection', function (socket) {
-    userCount++;
 
-    // initialize empty object for each connection using a counter as unique ID
-    users[userIdCounter] = {};
-    socket.userId = userIdCounter;
+    var initializeUser = function(){
+        userCount++;
+        // initialize empty object for each connection using a counter as unique ID
+        users[userIdCounter] = {};
+        socket.userId = userIdCounter;
+        userIdCounter++;
+
+        console.log("User #"+userIdCounter+" has connected");
+    };
+    initializeUser();
+
+
 
     socket.emit('user data', {
         userCount: userCount
@@ -57,6 +65,8 @@ io.on('connection', function (socket) {
             socket.broadcast.emit('user data', {
                 userCount: userCount
             });
+
+            console.log("User #"+userId+" has disconnected");
         }
     });
 });
