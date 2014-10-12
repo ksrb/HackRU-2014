@@ -1,0 +1,23 @@
+{
+  "name": "HackRU-2014",
+  "main": "index.js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/ksrb/HackRU-2014",
+  "authors": [
+    "Benson <chc6@njit.edu>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.2.0",
+    "socket.io": "~1.1.0",
+    "jquery": "~2.1.1"
+  }
+}

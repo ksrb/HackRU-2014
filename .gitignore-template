@@ -9,9 +9,12 @@
 
 #Node
 /node_modules
+#Bower
+/bower_components
 
 #File types
 *.log
 
 #Files
 .gitignore
+
