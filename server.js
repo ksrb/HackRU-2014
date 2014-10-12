@@ -36,15 +36,17 @@ app.use(express.static(__dirname + '/bower_components'));
 
     var onConnection = function(socket){
         var userId;
-        var initializeUser = function(socket){
+        var onUserLogin = function(userData){
             // increases current user counter for each socket connection
             onlineUserCount++;
 
             // initialize an user object for each connection using a counter as unique ID
             // the socket connection is stored inside the user
             userId = userIdCounter++;
+            var username = userData.username;
             var user = {
                 id: userId,
+                username:username,
                 socket: socket,
                 score: 0
             };
@@ -52,11 +54,12 @@ app.use(express.static(__dirname + '/bower_components'));
             // stores the user using the unique user id in the global users data
             users[userId] = user;
 
-            console.log("User #"+userIdCounter+" has connected");
+            console.log("***** User #"+userIdCounter+","+ user.username  +", has logged in *****");
 
             // notify all clients of current online user count
             notifyOnlineUserCount();
         };
+
         var notifyOnlineUserCount = function(){
             io.sockets.emit('user data', {
                 onlineUserCount : onlineUserCount
@@ -97,9 +100,9 @@ app.use(express.static(__dirname + '/bower_components'));
                 console.log("User #"+userId+" has disconnected");
             }
         };
+        socket.on('user login', onUserLogin);
         socket.on('send score', updateScore);
         socket.on('disconnect', onDisconnect);
-        initializeUser(socket);
     };
 
     // Emits an action signal event to all clients with a data interval
