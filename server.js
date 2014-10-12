@@ -8,7 +8,7 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
-var port = process.env.PORT || 5000;
+var port = process.env.PORT || 3000;
 
 server.listen(port, function () {
     console.log('Server listening at port %d', port);
@@ -19,39 +19,39 @@ app.use(express.static(__dirname + '/bower_components'));
 
 
 var users = {};
+var userIdCounter = 0;
 var userCount = 0;
 
 io.on('connection', function (socket) {
-    var addedUser = false;
+    userCount++;
 
-    // when the client emits 'add user', this listens and executes
-    socket.on('user login', function (data) {
-        var
-            username = data.username
-            ;
+    // initialize empty object for each connection using a counter as unique ID
+    users[userIdCounter] = {};
+    socket.userId = userIdCounter;
 
-        socket.username = username;
-        users[username] = data;
-        userCount++;
-
-        socket.emit('user data', {
-            userCount: userCount
-        });
-        socket.broadcast.emit('user data', {
-            userCount: userCount
-        });
+    socket.emit('user data', {
+        userCount: userCount
+    });
+    socket.broadcast.emit('user data', {
+        userCount: userCount
     });
 
-    // when the client emits 'add user', this listens and executes
+    socket.on('user login', function (data) {
+
+    });
+
+
     socket.on('hit success', function (username) {
 
     });
 
-    // when the user disconnects.. perform this
+
     socket.on('disconnect', function () {
-        var username = socket.username;
-        if (users[username]) {
-            delete users[username];
+        // retrieves userId from the socket disconnecting
+        var userId = socket.userId;
+
+        if (users[userId]) {
+            delete users[userId];
             userCount--;
 
             socket.broadcast.emit('user data', {
