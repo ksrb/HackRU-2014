@@ -4,11 +4,13 @@
 
 'use strict';
 
+// ------------ BASE SERVER CONFIGURATION -------------------
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
-var io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
+
+var io = require('socket.io')(server);
 
 server.listen(port, function () {
     console.log('Server listening at port %d', port);
@@ -18,59 +20,74 @@ app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/bower_components'));
 
 
-var users = {};
-var userIdCounter = 0;
-var userCount = 0;
 
-io.on('connection', function (socket) {
+// ---------- LOAD SOCKET.IO RELATED SCRIPTS ------------
 
-    var initializeUser = function(){
-        userCount++;
-        // initialize empty object for each connection using a counter as unique ID
-        users[userIdCounter] = {};
-        socket.userId = userIdCounter;
-        userIdCounter++;
+// to move to external script later
+(function(socketIO){
+    var users = {};
+    var userIdCounter = 0;
+    var onlineUserCount = 0;
 
-        console.log("User #"+userIdCounter+" has connected");
-    };
-    initializeUser();
+    var onConnection = function(socket){
+        var initializeUser = function(socket){
+            // increases current user counter for each socket connection
+            onlineUserCount++;
 
+            // initialize an user object for each connection using a counter as unique ID
+            // the socket connection is stored inside the user
+            var user = {};
+            user.id = userIdCounter;
+            user.socket = socket;
 
+            // stores the user using the unique user id in the global users data
+            users[userIdCounter] = user;
 
-    socket.emit('user data', {
-        userCount: userCount
-    });
-    socket.broadcast.emit('user data', {
-        userCount: userCount
-    });
+            // increase counter to use as unique user ID
+            userIdCounter++;
+            console.log("User #"+userIdCounter+" has connected");
 
-    socket.on('user login', function (data) {
-
-    });
-
-
-    socket.on('hit success', function (username) {
-
-    });
-
-
-    socket.on('disconnect', function () {
-        // retrieves userId from the socket disconnecting
-        var userId = socket.userId;
-
-        if (users[userId]) {
-            delete users[userId];
-            userCount--;
-
-            socket.broadcast.emit('user data', {
-                userCount: userCount
+            // notify all clients of current online user count
+            notifyOnlineUserCount();
+        };
+        var notifyOnlineUserCount = function(){
+            io.sockets.emit('user data', {
+                onlineUserCount : onlineUserCount
             });
+        };
+        var onDisconnect = function(){
+            // retrieve the user object using the unique id for this socket connection
+            var userId = user.id;
 
-            console.log("User #"+userId+" has disconnected");
-        }
-    });
-});
+            // if the user object exists, delete the user from users data and decrease current user counter
+            if (users[userId]){
+                delete users[userId];
+                onlineUserCount--;
 
+                socket.broadcast.emit('user data', {
+                    userCount: userCount
+                });
+
+                console.log("User #"+userId+" has disconnected");
+            }
+        };
+        socket.on('disconnect', onDisconnect);
+        initializeUser(socket);
+    };
+
+    var signalAction = function(){
+        var actionData = {
+            interval: 2000 //ms
+        };
+        io.sockets.emit('action signal', actionData)
+        console.log("An action signal is emitted to all clients");
+    };
+
+    io.on('connection', onConnection);
+
+    // For testing purposes, set an interval for repeat signaling action
+    setInterval(signalAction, 4000);
+}(io));
 
 /*
  io.on('connection', function (socket) {
