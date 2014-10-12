@@ -36,9 +36,11 @@ app.use(express.static(__dirname + '/bower_components'));
 
             // initialize an user object for each connection using a counter as unique ID
             // the socket connection is stored inside the user
-            var user = {};
-            user.id = userIdCounter;
-            user.socket = socket;
+            var user = {
+                id: userIdCounter,
+                socket: socket,
+                score: 0
+            };
 
             // stores the user using the unique user id in the global users data
             users[userIdCounter] = user;
@@ -55,6 +57,20 @@ app.use(express.static(__dirname + '/bower_components'));
                 onlineUserCount : onlineUserCount
             });
         };
+
+        // Based on user result success or fail, score is updated and broadcast to all clients
+        var updateScore = function(userResult){
+            var isSuccess = userResult.sucess;
+            var userId = userIdCounter;
+
+            var user = users[userId];
+            if (isSuccess){
+                user.score += 1000; // temp. hard-code score for successful result
+            }
+            // after score updates, broadcast scores to all clients
+            broadcastScore();
+        };
+
         var onDisconnect = function(){
             // the current userIdCounter is the userId used for initialization
             var userId = userIdCounter;
@@ -71,16 +87,32 @@ app.use(express.static(__dirname + '/bower_components'));
                 console.log("User #"+userId+" has disconnected");
             }
         };
+        socket.on('send score', updateScore);
         socket.on('disconnect', onDisconnect);
         initializeUser(socket);
     };
 
+    // Emits an action signal event to all clients with a data interval
     var signalAction = function(){
         var actionData = {
             interval: 2000 //ms
         };
         io.sockets.emit('action signal', actionData)
         console.log("An action signal is emitted to all clients");
+    };
+
+    var broadcastScore = function(){
+        var userScores = [];
+        for (var id in users){
+            if (users.hasOwnProperty(prop)){
+                var user = users[id];
+                var result = {
+                    score: user.score
+                };
+                userScores.push(result);
+            }
+        }
+        io.sockets.emit('score update', userScores);
     };
 
     io.on('connection', onConnection);
