@@ -6,6 +6,7 @@ $(function () {
     var socket = io();
 
     var beatsButton = $("#beats-button");
+    beatsButton.css("display", "none");
     var beatsButtonClickable = false;
 
     var toggleBeatsButton = function () {
@@ -39,11 +40,38 @@ $(function () {
         }, data.interval);
     });
 
-    var usernameSubmitHandler = function(){
-        socket.emit("user login", {username:usernameElem.val()});
+    var usernameSubmitHandler = function () {
+        var username = usernameElem.val();
+        if (username) {
+            socket.emit("user login", {username: usernameElem.val()});
+            beatsButton.css("display", "block");
+        } else {
+            beatsButton.unbind('click', beatsButtonClickHandler);
+        }
         console.log(usernameElem.val());
     };
 
     usernameSubmit.click(usernameSubmitHandler);
+
+
+    var renderTableContents = function (table, data) {
+        var tbody = table.find("tbody");
+        tbody.html('');
+        for (var i = 0; i < data.length; i++) {
+            var row = $(document.createElement('tr'));
+            for (var key in data[i]) {
+                if(data[i].hasOwnProperty(key)){
+                    var column = document.createElement('td');
+                    $(column).html(data[i][key])
+                    row.append(column);
+                }
+            }
+            tbody.append(row);
+        }
+    };
+
+    socket.on('score update', function (data) {
+        renderTableContents(scoresTable, data);
+    });
 
 });
