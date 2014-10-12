@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SoundOFF</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"> </script>
+</head>
+
+<body>
+    <script src="//connect.soundcloud.com/sdk.js"> </script>
+    
+    <script>
+    var currentSong;
+    SC.initialize({
+        client_id: "15c5a12b5d640af73b16bd240753ffbb"
+    });
+
+    $("#startStream").live("click", function(){
+        var trackId = $('input[name=song]:checked').val();
+        var str = "/tracks/"+trackId;
+        SC.stream(str, {autoPlay: true});
+    });
+
+    $("#stopStream").live("click", function(){
+     SC.recordStop();
+     console.log("Stopped ??");
+    });
+
+    function query(){
+        var searchQuery = $("#searchBox").val();
+        SC.get('/tracks', { q:searchQuery}, function(tracks){
+            $("#trackSelector").append("<form action=\"\">");
+            for(var i = 0; i < tracks.length; i++){
+                var str = i + "   : " + tracks[i].title + ":" + tracks[i].id;
+                console.log(str);
+                $("#trackSelector").append("<input type=\"radio\" name=\"song\" value=\""+tracks[i].id +"\">"+tracks[i].title+ "<br />");
+            };
+            $("#trackSelector").append("</form>");
+        })
+    }
+    </script>
+
+
+    <input type="text" id="searchBox" />
+    <input type="button" value="search" onclick="query()" />
+    <input type="button" href="#" id="startStream" class="big button" value="Play" />
+    <input type="button" href="#" id="stopStream" class="big button" value="Stop" />
+    <div id="trackSelector">
+    </div>
+</body>
+
+</html>
