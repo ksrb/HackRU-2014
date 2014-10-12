@@ -1,5 +1,6 @@
 $(function () {
     var usernameElem = $("#username");
+    var usernameSubmit = $("#username-submit");
     var scoresTable = $("#scores-table");
     var songsTable = $("#songs-table");
     var socket = io();
@@ -17,7 +18,7 @@ $(function () {
             beatsButton.removeClass("btn-primary");
             beatsButton.addClass("btn-danger");
         }
-    }
+    };
 
     var beatsButtonClickHandler = function () {
         if (beatsButtonClickable == true) {
@@ -25,13 +26,12 @@ $(function () {
             socket.emit("send score", {success: true});
             console.log("Beat hit");
         }
-    }
+    };
 
     beatsButton.click(beatsButtonClickHandler);
 
     socket.on('action signal', function (data) {
         toggleBeatsButton();
-
         setTimeout(function () {
             toggleBeatsButton();
             beatsButton.unbind('click', beatsButtonClickHandler);
@@ -39,9 +39,11 @@ $(function () {
         }, data.interval);
     });
 
-    var showTime = function () {
-        var date = new Date();
-        console.log(date.getSeconds());
-    }
+    var usernameSubmitHandler = function(){
+        socket.emit("user login", {username:usernameElem.val()});
+        console.log(usernameElem.val());
+    };
+
+    usernameSubmit.click(usernameSubmitHandler);
 
 });
