@@ -35,23 +35,23 @@ app.use(express.static(__dirname + '/bower_components'));
     var onlineUserCount = 0;
 
     var onConnection = function(socket){
+        var userId;
         var initializeUser = function(socket){
             // increases current user counter for each socket connection
             onlineUserCount++;
 
             // initialize an user object for each connection using a counter as unique ID
             // the socket connection is stored inside the user
+            userId = userIdCounter++;
             var user = {
-                id: userIdCounter,
+                id: userId,
                 socket: socket,
                 score: 0
             };
 
             // stores the user using the unique user id in the global users data
-            users[userIdCounter] = user;
+            users[userId] = user;
 
-            // increase counter to use as unique user ID
-            userIdCounter++;
             console.log("User #"+userIdCounter+" has connected");
 
             // notify all clients of current online user count
@@ -65,15 +65,18 @@ app.use(express.static(__dirname + '/bower_components'));
 
         // Based on user result success or fail, score is updated and broadcast to all clients
         var updateScore = function(userResult){
-            var isSuccess = userResult.sucess;
-            var userId = userIdCounter;
-
             var user = users[userId];
+
+            var isSuccess = userResult.success;
             if (isSuccess){
                 user.score += config.SCORE_SUCCESS; // temp. hard-code score for successful result
+                console.log("The user successes and now has a score of "+user.score);
+            } else {
+                console.log("The user fails and now has a score of "+user.score);
             }
             // after score updates, broadcast scores to all clients
             broadcastScore();
+
         };
 
         var processVote = function(vote){
@@ -82,16 +85,13 @@ app.use(express.static(__dirname + '/bower_components'));
         };
 
         var onDisconnect = function(){
-            // the current userIdCounter is the userId used for initialization
-            var userId = userIdCounter;
-
             // if the user object exists, delete the user from users data and decrease current user counter
             if (users[userId]){
                 delete users[userId];
                 onlineUserCount--;
 
                 socket.broadcast.emit('user data', {
-                    userCount: userCount
+                    onlineUserCount: onlineUserCount
                 });
 
                 console.log("User #"+userId+" has disconnected");
@@ -108,7 +108,7 @@ app.use(express.static(__dirname + '/bower_components'));
             interval: 2000 //ms
         };
         io.sockets.emit('action signal', actionData)
-        console.log("An action signal is emitted to all clients");
+        console.log("------- An action signal is emitted to all clients -------");
     };
 
     var broadcastScore = function(){
@@ -117,12 +117,14 @@ app.use(express.static(__dirname + '/bower_components'));
             if (users.hasOwnProperty(id)){
                 var user = users[id];
                 var result = {
+                    username: user.username,
                     score: user.score
                 };
                 userScores.push(result);
             }
         }
         io.sockets.emit('score update', userScores);
+        console.log("Scores are broadcast to all clients");
     };
 
     var getOpenSongs = function(){
