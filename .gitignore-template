@@ -1,0 +1,17 @@
+#IDEA
+/.idea
+/out
+*.iml
+
+#Eclipse
+/.settings
+.project
+
+#Node
+/node_modules
+
+#File types
+*.log
+
+#Files
+.gitignore
