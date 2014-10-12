@@ -114,7 +114,7 @@ app.use(express.static(__dirname + '/bower_components'));
     var broadcastScore = function(){
         var userScores = [];
         for (var id in users){
-            if (users.hasOwnProperty(prop)){
+            if (users.hasOwnProperty(id)){
                 var user = users[id];
                 var result = {
                     score: user.score
