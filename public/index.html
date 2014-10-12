@@ -2,16 +2,81 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Socket.IO Chat Example</title>
+    <title>HackRU-2014</title>
+    <link rel="stylesheet" href="css/style.css"/>
     <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="bootstrap/dist/css/bootstrap-theme.min.css"/>
 </head>
 <body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3"><h3>Beat master: <span id="username">Daryl</span></h3></div>
+        <div class="col-md-6"></div>
+        <div class="col-md-3">
+            <table id="scores-table" class="table table-striped table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Score</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Benson</td>
+                    <td>6854</td>
+                </tr>
+                <tr>
+                    <td>Kevin</td>
+                    <td>2334</td>
+                </tr>
+                <tr>
+                    <td>Kevin</td>
+                    <td>8954</td>
+                </tr>
+                <tr>
+                    <td>Daryl</td>
+                    <td>1234</td>
+                </tr>
+                </tbody>
+            </table>
 
-<label class="userCount" >User Count: 0</label>
-
-<input class="username" type="text" />
-<button class="login btn btn-success">Login</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-3">
+            <button id="beats-button" class="btn btn-primary btn-lg btn-block">Beats</button>
+        </div>
+        <div class="col-md-3"></div>
+        <div class="col-md-3">
+            <table id="songs-table" class="table table-striped table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>Song</th>
+                    <th>Score</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Song 1</td>
+                    <td>1232325</td>
+                </tr>
+                <tr>
+                    <td>Song 2</td>
+                    <td>123566</td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="2">
+                        <button type="button" class="btn btn-primary btn-block">Vote</button>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
 
 
 <script src="jquery/dist/jquery.min.js"></script>
