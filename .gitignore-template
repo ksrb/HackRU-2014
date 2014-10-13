@@ -4,8 +4,10 @@
 *.iml
 
 #Eclipse
-/.settings
 .project
+.classpath
+/.settings
+/bin
 
 #Node
 /node_modules
@@ -17,4 +19,3 @@
 
 #Files
 .gitignore
-
